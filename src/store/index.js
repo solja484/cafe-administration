@@ -119,7 +119,8 @@ export default new Vuex.Store({
         },
         deleteDishFromOrder({commit, dispatch}, data) {
             commit("setLoading", true);
-            axios.delete('https://naukmacafeapi.azurewebsites.net/api/Order/removefromorder/' + data.orderId, {dishId:data.dishId})
+            axios.delete('https://naukmacafeapi.azurewebsites.net/api/Order/removefromorder/' + data.orderId,
+                { data: {dishId:data.dishId}})
                 .then(() => dispatch("fetchBillInfo", data.orderId))
                 .catch((err) => console.log(err))
                 .finally(() => commit("setLoading", false))

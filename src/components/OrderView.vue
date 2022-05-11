@@ -146,6 +146,7 @@ export default {
   methods: {
     printOrder: function () {
       //TODO print order
+      window.print();
     },
     deleteOrder: function () {
       this.$store.dispatch('deleteOrder', this.currentOrder.id)
@@ -159,10 +160,7 @@ export default {
       this.$store.dispatch('addDishToOrder', data)
     },
     deleteDish: function (dish) {
-      console.log(dish);
-
       const dishId=this.$store.getters['dishes'].filter(d=>d.name.replace(/\s+/g, ' ').trim()==dish.name)[0].id
-      console.log(dishId);
       this.$store.dispatch('deleteDishFromOrder', {
         orderId: this.$store.getters['currentBill'].id,
         dishId: dishId
