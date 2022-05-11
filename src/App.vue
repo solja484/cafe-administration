@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
       <b-navbar toggleable="sm" type="light" variant="light" class="navbar-margin">
         <b-navbar-toggle target="nav-text-collapse" text-center></b-navbar-toggle>
         <b-navbar-brand class="brand">
@@ -15,12 +14,11 @@
               <router-link to="/menu">Меню</router-link>
             </b-nav-item>
             <b-nav-item>
-              <router-link to="/kitchen">Кухня</router-link>
+              <router-link to="/kitchen">Кухня<sup>beta</sup></router-link>
             </b-nav-item>
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>
-
     <router-view/>
   </div>
 </template>

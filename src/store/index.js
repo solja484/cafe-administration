@@ -61,7 +61,6 @@ export default new Vuex.Store({
         },
         fetchBillsList({commit, dispatch}, first) {
             commit("setLoading", true);
-
             axios
                 .get('https://naukmacafeapi.azurewebsites.net/api/Order/all')
                 .then((res) => {
@@ -71,8 +70,6 @@ export default new Vuex.Store({
                 })
                 .catch((err) => console.log(err))
                 .finally(() =>
-
-
                     commit("setLoading", false));
         },
         fetchBillInfo({commit}, id) {
@@ -98,33 +95,32 @@ export default new Vuex.Store({
                 .catch((err) => console.log(err))
                 .finally(() => commit("setLoading", false));
         },
-        changeWaiter({commit}, data) {
-            commit("setLoading", true);
-            console.log(data);
-            commit("setLoading", false);
-        },
-        createOrder({commit,dispatch},data) {
+        createOrder({commit, dispatch}, data) {
             commit("setLoading", true);
             axios
                 .post('https://naukmacafeapi.azurewebsites.net/api/Order', data)
-                .then((res) => dispatch("fetchBillInfo", res.id)
-                    .then(() => dispatch("fetchBillsList"))
+                    .then(() => dispatch("fetchBillsList",true))
                     .catch((err) => console.log(err))
-                    .finally(() => commit("setLoading", false))
-                );
+                    .finally(() => commit("setLoading", false));
         },
-        deleteOrder({commit,dispatch},id) {
+        deleteOrder({commit, dispatch}, id) {
             commit("setLoading", true);
-            axios.delete('https://naukmacafeapi.azurewebsites.net/api/Order/'+id)
-                .then(() => dispatch("fetchBillsList",true))
+            axios.delete('https://naukmacafeapi.azurewebsites.net/api/Order/' + id)
+                .then(() => dispatch("fetchBillsList", true))
                 .catch((err) => console.log(err))
                 .finally(() => commit("setLoading", false))
         },
-        addDishToOrder({commit,dispatch},data){
+        addDishToOrder({commit, dispatch}, data) {
             commit("setLoading", true);
-
-            axios.put('https://naukmacafeapi.azurewebsites.net/api/Order/'+data.orderId,data)
-                .then(() => dispatch("fetchBillInfo",data.orderId))
+            axios.post('https://naukmacafeapi.azurewebsites.net/api/Order/' + data.orderId, data)
+                .then(() => dispatch("fetchBillInfo", data.orderId))
+                .catch((err) => console.log(err))
+                .finally(() => commit("setLoading", false))
+        },
+        deleteDishFromOrder({commit, dispatch}, data) {
+            commit("setLoading", true);
+            axios.delete('https://naukmacafeapi.azurewebsites.net/api/Order/removefromorder/' + data.orderId, {dishId:data.dishId})
+                .then(() => dispatch("fetchBillInfo", data.orderId))
                 .catch((err) => console.log(err))
                 .finally(() => commit("setLoading", false))
         }
@@ -137,21 +133,16 @@ export default new Vuex.Store({
             state.categories = data;
         },
         setDishes(state, data) {
-            console.log(data)
-            state.dishes = data;
+            console.log(data);
+            state.dishes=data.sort((a, b) => a.name.localeCompare(b.name));
         },
         setKitchenDishes(state, data) {
             state.kitchenDishes = data;
         },
         setBillsList(state, data) {
-            console.log(data)
             state.billsList = data;
         },
         setBillInfo(state, data) {
-            //TODO proper date format
-
-            console.log('Order');
-            console.log(data);
             state.currentBill = data;
             state.currentBill.totalSum = data.totalSum.toFixed(2);
             const dt = new Date(data.dateStart);

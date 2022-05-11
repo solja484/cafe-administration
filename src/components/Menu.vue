@@ -10,10 +10,14 @@
       <b-col></b-col>
       <b-col cols="10">
         <div class='menu-category' v-for="c in categories" :key="c.id">
-          <p>{{ c.name }}</p>
           <b-row>
-          <b-col cols="5"><DishesList :category="c.id" class="menu-dishes"></DishesList></b-col>
-            <b-col cols="5"><b-img fluid rounded  :src="c.img" :alt="c.name"></b-img></b-col>
+            <b-col cols="7">
+              <p>{{ c.name }}</p>
+              <DishesList :category="c.id" class="menu-dishes"></DishesList>
+            </b-col>
+            <b-col cols="5">
+              <b-img fluid rounded :src="c.image" :alt="c.name"></b-img>
+            </b-col>
           </b-row>
         </div>
       </b-col>
@@ -51,6 +55,7 @@ export default {
   font-weight: bold;
   font-size: 16px;
   text-align: left;
+  margin-bottom: 15px;
 }
 
 .menu-dishes {
@@ -58,7 +63,8 @@ export default {
   font-size: 14px;
   margin-left: 30px;
 }
-.iris-loader{
+
+.iris-loader {
   color: #8D8EED;
   margin-top: 100px;
 }

@@ -17,40 +17,41 @@
               class="width-100"
               required>
             <option v-for="d in dishes" :key="d.id" :value="d.id">{{ d.name }}</option>
-          </b-form-select><br><br>
-      <span>Кількість:  {{ amount }}</span><br>
-      <b-form-input v-model="amount" type="range" min="1" max="10"
-                    class="width-100" style="color: #8D8EED !important;" ></b-form-input>
-
-      <template #modal-footer>
-        <b-button
-            variant="light"
-            @click="showDishModal=false">
-          Скасувати
-        </b-button>
-        <b-button
-            variant="light"
-            class="iris float-right"
-            :disabled="!newDish"
-            @click="addNewDish(currentOrder.id)">
-          Додати
-        </b-button>
-      </template>
-      </b-modal>
-      <br>
-      <span class="subtitle-2">{{ currentOrder.displayDate }}</span>
+          </b-form-select>
+          <br><br>
+          <span>Кількість:  {{ amount }}</span><br>
+          <b-form-input v-model="amount" type="range" min="1" max="10"
+                        class="width-100" style="color: #8D8EED !important;"></b-form-input>
+          <template #modal-footer>
+            <b-button
+                variant="light"
+                @click="showDishModal=false">
+              Скасувати
+            </b-button>
+            <b-button
+                variant="light"
+                class="iris float-right"
+                :disabled="!newDish"
+                @click="addNewDish(currentOrder.id)">
+              Додати
+            </b-button>
+          </template>
+        </b-modal>
+        <br>
+        <span class="subtitle-2">{{ currentOrder.displayDate }}</span>
       </p>
     </b-row>
     <b-row>
-      <b-table-simple id="dishesTable" class="table">
+      <b-table-simple id="dishesTable" class="table" hover>
         <b-tbody>
           <b-tr class="table-color-row">
             <b-th colspan="2">Назва</b-th>
             <b-th>К-сть х Ціна за 1</b-th>
-            <b-th class="table-prices">Ціна ост.</b-th>
+            <b-th class="table-prices">Ціна ост.
+            </b-th>
           </b-tr>
-          <b-tr v-for="d in currentOrder.dishes" :key="d.id">
-            <b-td colspan="2">
+          <b-tr v-for="d in currentOrder.dishes" :key="d.name"  @click="showDeleteModal=true">
+            <b-td colspan="2" class="cursor-delete">
               {{ d.name }}
             </b-td>
             <b-td>
@@ -59,10 +60,28 @@
             <b-td class="table-prices">
               {{ (d.amount * d.price).toFixed(2) }}
             </b-td>
+            <b-td>
+            </b-td>
+            <b-modal v-model="showDeleteModal" title="Підтвердіть видалення страви">
+              <p>Справді видалити страву {{d.name}} з чеку?</p>
+              <template #modal-footer>
+                <b-button
+                    variant="light"
+                    @click="showDeleteModal=false">
+                  Скасувати
+                </b-button>
+                <b-button
+                    variant="danger"
+                    @click="deleteDish(d)">
+                  Видалити
+                </b-button>
+              </template>
+            </b-modal>
           </b-tr>
           <b-tr class="table-color-row">
             <b-th colspan="3">Сума:</b-th>
             <b-th class="table-total table-prices">{{ currentOrder.totalSum }} UAN</b-th>
+
           </b-tr>
         </b-tbody>
       </b-table-simple>
@@ -73,8 +92,25 @@
       </b-col>
       <b-col cols="6"></b-col>
       <b-col cols="3">
-        <b-button variant="outline-danger" class="float-right" @click="deleteOrder()">Видалити чек</b-button>
+        <b-button variant="outline-danger" class="float-right" @click="showDeleteOrderModal=true">Видалити чек</b-button>
       </b-col>
+    </b-row>
+    <b-row>
+      <b-modal v-model="showDeleteOrderModal" title="Видалення чеку">
+        <p>Справді видалити чек?</p>
+        <template #modal-footer>
+          <b-button
+              variant="light"
+              @click="showDeleteOrderModal=false">
+            Скасувати
+          </b-button>
+          <b-button
+              variant="danger"
+              @click="deleteOrder()">
+            Видалити
+          </b-button>
+        </template>
+      </b-modal>
     </b-row>
   </b-container>
 </template>
@@ -88,7 +124,9 @@ export default {
       waiter: this.$store.getters['currentBill'].waiter,
       showDishModal: false,
       newDish: null,
-      amount: 1
+      amount: 1,
+      showDeleteModal:false,
+      showDeleteOrderModal:false
     }
   },
   computed: {
@@ -107,13 +145,10 @@ export default {
   },
   methods: {
     printOrder: function () {
-//TODO print order
+      //TODO print order
     },
     deleteOrder: function () {
       this.$store.dispatch('deleteOrder', this.currentOrder.id)
-    },
-    changeWaiter: function (w) {
-      this.$store.dispatch('changeWaiter', {orderId: this.$store.getters['currentBill'].id, waiterId: w})
     },
     addNewDish: function (orderId) {
       const data = {
@@ -122,6 +157,16 @@ export default {
         "dishId": this.$data.newDish
       }
       this.$store.dispatch('addDishToOrder', data)
+    },
+    deleteDish: function (dish) {
+      console.log(dish);
+
+      const dishId=this.$store.getters['dishes'].filter(d=>d.name.replace(/\s+/g, ' ').trim()==dish.name)[0].id
+      console.log(dishId);
+      this.$store.dispatch('deleteDishFromOrder', {
+        orderId: this.$store.getters['currentBill'].id,
+        dishId: dishId
+      })
     }
   }
 }
@@ -188,6 +233,12 @@ export default {
 .iris, .iris:hover, .iris:active, .iris:focus {
   color: white;
   background-color: #8D8EED !important;
+}
 
+.shmall {
+  width: 50px !important;
+}
+
+.cursor-delete{ cursor: pointer;
 }
 </style>
